@@ -22,7 +22,7 @@ namespace cis237Assignment6.Controllers
 
         public ActionResult Contact()
         {
-            ViewBag.Message = "Your contact page.";
+            ViewBag.Message = "Please contact us with any questions about our products or services.";
 
             return View();
         }
