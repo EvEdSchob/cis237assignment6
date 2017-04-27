@@ -1,14 +1,50 @@
 ﻿@model IEnumerable<cis237Assignment6.Models.Beverage>
 
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Beverages";
 }
 
-<h2>Index</h2>
+<h2>Beverages</h2>
+
+<div class="form-group">
+    <fieldset>
+        <legend>Search Filter</legend>
+
+        @{
+            @*Open up a form that will go to the filter method on the Beverages controller with a POST request*@
+        using (Html.BeginForm("Filter", "Beverages", FormMethod.Post, new { @class = "form-inline" }))
+        {
+            @*Render out the AntiForgery Token for the form*@
+            @Html.AntiForgeryToken()
+            <label for="pack">Name</label>
+            @Html.TextBox("name", (string)ViewBag.filterName)
+            <label for="pack">Pack</label>
+            @Html.TextBox("pack", (string)ViewBag.filterPack)
+            <label for="minPrice">Minimum Price</label>
+            //@Html.TextBox("minPrice", (string)ViewBag.filterMinPrice)
+            <input name="minPrice" type="number" min="0" max="@Decimal.MaxValue" value="@ViewBag.filterMinPrice" />
+            <label for="maxPrice">Maximum Price</label>
+            //@Html.TextBox("maxPrice", (string)ViewBag.filterMaxPrice)
+            <input name="maxPrice" type="number" min="0" max="@Decimal.MaxValue" value="@ViewBag.filterMaxPrice" />
+            <br />
+            <input type="submit" value="Filter" class="btn btn-info pull-right" />
+
+        }
+
+        using (Html.BeginForm("ResetFilter", "Beverages", FormMethod.Post, new { @class = "form-inline" }))
+        {
+            @*Render out the AntiForgery Token for the form*@
+            @Html.AntiForgeryToken()
+            <input type="submit" value="Reset Filters" class="btn btn-info pull-right" />
+        }
+        }
+    </fieldset>
+</div>
 
 <p>
     @Html.ActionLink("Create New", "Create")
 </p>
+
 <table class="table">
     <tr>
         <th>

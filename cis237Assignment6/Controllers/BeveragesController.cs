@@ -10,6 +10,7 @@ using cis237Assignment6.Models;
 
 namespace cis237Assignment6.Controllers
 {
+    [Authorize]
     public class BeveragesController : Controller
     {
         private BeverageESchoberEntities db = new BeverageESchoberEntities();
@@ -17,7 +18,57 @@ namespace cis237Assignment6.Controllers
         // GET: Beverages
         public ActionResult Index()
         {
-            return View(db.Beverages.ToList());
+            DbSet<Beverage> BeveragesToFilter = db.Beverages;
+
+            string filterName = "";
+            string filterPack = "";
+            string filterMinPrice = "";
+            string filterMaxPrice = "";
+
+            //Define the default min and max price value
+            decimal minPrice = 0;
+            decimal maxPrice = Decimal.MaxValue; 
+            //This defines the maximum value that can be stored by an decimal variable.
+
+
+            if (Session["name"] != null && !string.IsNullOrWhiteSpace((string)Session["name"]))
+            {
+                filterName = (string)Session["name"];
+            }
+
+            if (Session["pack"] != null && !string.IsNullOrWhiteSpace((string)Session["pack"]))
+            {
+                filterPack = (string)Session["pack"];
+            }
+
+            if (Session["minPrice"] != null && !string.IsNullOrWhiteSpace((string)Session["minPrice"]))
+            {
+                filterMinPrice = (string)Session["minPrice"];
+                minPrice = Decimal.Parse(filterMinPrice);
+            }
+
+            if (Session["maxPrice"] != null && !string.IsNullOrWhiteSpace((string)Session["maxPrice"]))
+            {
+                filterMaxPrice = (string)Session["maxPrice"];
+                maxPrice = Decimal.Parse(filterMaxPrice);
+            }
+
+            //Filter the BeveragesToFilter Dataset using a lambda expression including the input values.
+            IEnumerable<Beverage> filtered = BeveragesToFilter.Where(beverage => beverage.price >= minPrice &&
+                                                      beverage.price <= maxPrice &&
+                                                      beverage.name.Contains(filterName) &&
+                                                      beverage.pack.Contains(filterPack));
+
+            //Convert the filtered dataset to a list.
+            IEnumerable<Beverage> finalFiltered = filtered.ToList();
+
+
+            ViewBag.filterName = filterName;
+            ViewBag.filterPack = filterPack;
+            ViewBag.filterMinPrice = filterMinPrice;
+            ViewBag.filterMaxPrice = filterMaxPrice;
+
+            return View(finalFiltered);
         }
 
         // GET: Beverages/Details/5
@@ -122,6 +173,45 @@ namespace cis237Assignment6.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Filter()
+        {
+            string name = Request.Form.Get("name");
+            string pack = Request.Form.Get("pack");
+            string minPrice = Request.Form.Get("minPrice");
+            string maxPrice = Request.Form.Get("maxPrice");
+
+            Session["name"] = name;
+            Session["pack"] = pack;
+            Session["minPrice"] = minPrice;
+            Session["maxPrice"] = maxPrice;
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult ResetFilter()
+        {
+            string name = "";
+            string pack = "";
+            string minPrice = "";
+            string maxPrice = "";
+
+            Session["name"] = name;
+            Session["pack"] = pack;
+            Session["minPrice"] = minPrice;
+            Session["maxPrice"] = maxPrice;
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult Json()
+        {
+            return Json(db.Beverages.ToList(), JsonRequestBehavior.AllowGet);
         }
     }
 }
