@@ -99,13 +99,18 @@ namespace cis237Assignment6.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult Create([Bind(Include = "id,name,pack,price,active")] Beverage beverage)
         {
-            if (ModelState.IsValid)
+            string id = beverage.id.ToString();
+            if (db.Beverages.Find(id) == null)
             {
-                db.Beverages.Add(beverage);
-                db.SaveChanges();
-                return RedirectToAction("Index");
+                if (ModelState.IsValid)
+                {
+                    db.Beverages.Add(beverage);
+                    db.SaveChanges();
+                    ViewBag.ErrorMessage = "";
+                    return RedirectToAction("Index");
+                }
             }
-
+            ViewBag.ErrorMessage = "A beverage with this ID already exists!";
             return View(beverage);
         }
 
