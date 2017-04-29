@@ -135,4 +135,13 @@ the culprit, but I don't know which ones.
 
 ## Outside Resources Used
 
+Bootstrap-live-customizer.com for Bootstrap.css themes
+
 ## Known Problems, Issues, And/Or Errors in the Program
+
+None that I know of 
+
+## Extra Credit
+
+Added validation check to ID field on Create page.
+Added validation for Numeric filter fields.
